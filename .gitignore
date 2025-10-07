@@ -5,6 +5,10 @@ build/
 dist/
 wheels/
 *.egg-info
+oauth_generator.py
 
 # Virtual environments
 .venv
+.env
+app/google_keys.json
+app/token.json

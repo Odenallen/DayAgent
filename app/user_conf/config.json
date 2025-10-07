@@ -1,0 +1,16 @@
+{
+    "name":"Oden",
+    "location":"Stockholm",
+    "work_location":[{"address":"Råstavägen 3","city":"Solna","postal code":"169 54"}],
+    "home_location":[{"address":"Kungsholms Strand 159","city":"Stockholm","postal code":"112 48"}],
+    "dentist_location": [{"address":null,"city":null,"postal code":null}],
+    "calendar_ids": null,
+    "local_weather_station": null,
+    "default_meeting_location": null
+    
+    
+    
+ 
+
+}
+
