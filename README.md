@@ -1,105 +1,267 @@
+# DayAgent 🤖
 
+A sophisticated AI-powered personal assistant that creates comprehensive daily briefings by integrating calendar events, emails, weather forecasts, transportation routes, and location data into beautifully formatted markdown reports.
 
-# TODO
-## MCP
-- MCP Google Calendar Server (Done)
-- Gmail MCP server up and running(Done)
-    - Read emails from the correct day(Not working)
-    - Come up with way to get LLM to summerize email from correct day.
-    - Get working MCP server. (Done)
+## 🌟 Introduction
 
-- Weather MCP server Running (Done)
-    - Get weather for specific location today.(Done)
-    - Get weather for specific location at specific date.(Done)
-    - Get Precipitation Rate (Done)
+DayAgent is an intelligent automation system designed to streamline your daily routine by automatically collecting and organizing all essential information you need for the day. It leverages multiple MCP (Model Context Protocol) servers and AI agents to gather data from various sources and generate personalized daily briefings.
 
-- MarkDown to PDF MCP server.(Done)
-    - Working with readme file(Done)
+The system checks your calendar events, retrieves new emails, calculates transportation routes between locations, fetches weather forecasts, and compiles everything into a readable markdown format that can be easily converted to PDF or shared via email.
 
-- Google Tasks?
-    - For reminder
+## 🧠 What are MCP Servers?
 
-## Alpha
+MCP (Model Context Protocol) servers are specialized services that provide tools and resources to AI agents through a standardized protocol. They act as bridges between AI systems and external data sources or services. In DayAgent, we utilize multiple MCP servers to access different APIs and services seamlessly.
 
-### Testing
-- [x] Jinja2 Template
-  - [x] No class
-  - [x] Simple class
-  - [x] Nested classed 
-- [ ] Memory
+### 🛠️ MCP Servers Used in DayAgent
 
+1. **Google Calendar MCP Server** (`@cocal/google-calendar-mcp`)
+   - Purpose: Fetches your calendar events for today
+   - Provides: Event details including times, locations, and descriptions
 
-### bot.py
-- [x] Config loading
-- [x] conf -> Class
-- [x] Memory
+2. **Google Maps MCP Server** (`mcp/google-maps`)
+   - Purpose: Calculates public transportation routes and travel times
+   - Provides: Transit directions, travel durations, and route details
 
-### ClassStructs
-- [x] Mail Class implemented
-- [x] Mail Class tested
-- [x] MDdata Complete
+3. **Gmail MCP Server** (`@gongrzhe/server-gmail-autoauth-mcp`)
+   - Purpose: Retrieves your daily unread emails
+   - Provides: Email subjects, senders, and brief content summaries
 
-### General
-- [ ] Decide if we want pdf generation or stick with MD
-- [ ] Token refresh for each tool!
+4. **Weather MCP Server** (`weatherxm-pro`)
+   - Purpose: Fetches accurate weather forecasts
+   - Provides: Hourly temperature and precipitation data
 
-### State of affair
+5. **Time MCP Server** (`mcp-server-time`)
+   - Purpose: Handles timezone conversions and date/time operations
+   - Provides: Current time information for scheduling
 
-  - [x] Make structured_response part of data.
-  - [x] How should I handle the class of the calendar events? (Maybe fixed)
-  - [x] Generate prompt for transportation node.
-  - [ ]  
-  - [ ] Understand why LLM call sending warnings
+6. **Markdown-to-PDF MCP Server** (`md-pdf-mcp`)
+   - Purpose: Converts generated markdown reports to PDF format
+   - Provides: Document generation capabilities
 
-## Beta
-### Beta implementations
- - [ ] Use SL API Instead of Google Maps for transportation?
- - [ ] Use MCP tool to use webb to find lat and long if the weather tool does not provide one.
+## 📁 File Structure
 
+```
+DayAgent/
+├── app/
+│   ├── bot.py                 # Main agent logic and LangGraph workflow
+│   ├── classStructs.py        # Data models and type definitions
+│   ├── my_mcp.py              # MCP configuration loader
+│   ├── user_conf/
+│   │   └── config.json        # User configuration file
+│   ├── templates/
+│   │   ├── email-template.md  # Jinja2 template for daily briefs
+│   │   └── prompts.py         # LLM prompts for different tasks
+│   └── mcp_config.json        # MCP server definitions and settings
+├── result/
+│   ├── results.json           # Generated data from each run
+│   └── generatedMD.md       # Final markdown output
+├── main.py                    # Entry point (simple print statement)
+├── pyproject.toml            # Project dependencies
+├── uv.lock                   # Locked dependencies
+└── .gitignore               # Git ignore rules
+```
 
+## ⚙️ Configuration
 
-# GitHub länkar
-- https://github.com/GongRzhe/Gmail-MCP-Server?tab=readme-ov-file
-- https://github.com/WeatherXM/weatherxm-pro-mcp
-- https://github.com/seanivore/Convert-Markdown-PDF-MCP
-- https://github.com/nspady/google-calendar-mcp
-- https://github.com/modelcontextprotocol/servers-archived/tree/main/src/google-maps
+### User Settings (`app/user_conf/config.json`)
+```json
+{
+    "name": "Your Name",
+    "location": "Stockholm",
+    "work_location": [{"address": "Address", "city": "City", "postal code": "123 45"}],
+    "home_location": [{"address": "Home Address", "city": "City", "postal code": "123 45"}],
+    "dentist_location": [{"address": null, "city": null, "postal code": null}],
+    "calendar_ids": null,
+    "local_weather_station": null,
+    "default_meeting_location": null
+}
+```
 
-# Websidor
-- https://pro.weatherxm.com/?station=scruffy-maize-cirrostratus
-- https://www.trafiklab.se/sv/api/our-apis/sl/transport/
+### MCP Server Configuration (`app/mcp_config.json`)
+The MCP servers are configured with specific environment variables, API keys, and OAuth credentials. Each server requires appropriate authentication tokens and API keys to function properly.
 
+## 🔧 How It Works
 
+### Core Architecture
+DayAgent uses a **LangGraph-based workflow** that orchestrates multiple AI agents to gather and process daily information:
 
-# Later
-- Script hiding all API keys and json files with keys
-- Understand why its printing things like:
-    "Key '$schema' is not supported in schema, ignoring
-    Key 'additionalProperties' is not supported in schema, ignoring
-    Key '$schema' is not supported in schema, ignoring"
+1. **DataCollector Agent**: Fetches data from various sources using MCP tools
+2. **ContentProcessor Agent**: Processes and formats the collected data
+3. **PDFGenerator Agent**: Converts markdown output to PDF (optional)
 
+### Workflow Process
 
-# Prompts
+The agent follows this sequential process:
 
+1. **Configuration Loading**: Reads user settings and MCP configurations
+2. **Calendar Check**: Retrieves today's events with times and locations
+3. **Email Retrieval**: Fetches new unread emails from today
+4. **Transportation Planning**: Calculates routes between event locations
+5. **Weather Forecast**: Gets hourly weather data for the user's location
+6. **Data Processing**: Compiles all information into structured format
+7. **Template Rendering**: Generates final markdown report using Jinja2
+8. **Output Generation**: Saves results as JSON and markdown files
 
-## weatherxm-pro-mcp
+### Key Components
 
-what is the weather forcast for the station with station id: 85a88940-4df3-11ed-960b-b351f0b0cc44, check precipitation , starting on the 17th of september 2025 and ends with the 18th of september 2025, I would like the forecast to be hourly. Be careful with the parameters, make sure they are correctly named, example:
-{'forecast_to': '2025-09-18', 'forecast_from': '2025-09-17', 'forecast_cell_index': '85a88940-4df3-11ed-960b-b351f0b0cc44', 'forecast_include': 'hourly'}
+#### **DataCollector Class**
+Handles all data collection through MCP tools:
+- `setLLM()`: Configures language models with MCP tool integration
+- `check_calender()`: Calendar events retrieval
+- `transportation_node()`: Public transit route calculation
+- `mail_node()`: Email fetching and formatting
+- `weather_node()`: Weather data collection
+- `saveConf()`: Data persistence
 
-what is the weather forcast for the station with station id: 85a88940-4df3-11ed-960b-b351f0b0cc44, check temperature, precipitation and windSpeed, starting on the 17th of september 2025 and ends with the 18th of september 2025, I would like the forecast to be hourly. Be careful with the parameters, make sure they are correctly named, example:
-{'forecast_to': '2025-09-18', 'forecast_from': '2025-09-17', 'forecast_cell_index': '85a88940-4df3-11ed-960b-b351f0b0cc44', 'forecast_include': 'hourly'}. Make seperate calls for each variable with the given information if it is needed. Also present the information formatted for each day.
+#### **ContentProcessor Class**
+Processes and formats the collected data:
+- `generate_md()`: Renders Jinja2 template with collected data
+- `load_template_from_file()`: Loads email template
+- Template supports dynamic calendar events with integrated transportation info
 
+#### **State Management**
+Uses LangGraph's MemorySaver for conversation history and state management throughout the workflow.
 
+## 🚀 Getting Started
 
-## markdown2pdf
+### Prerequisites
+- Python 3.10+
+- uv (modern Python package manager)
+- Node.js and npm (for MCP servers)
+- Docker (for Google Maps MCP server)
+- Required API keys and OAuth credentials
 
-Can you make a pdf from the markdown:  " # TEST MARKDOWN2PDF \\n ##Working?". Call it "markdown2pdf-test", no date needed. Store this in the '/home/oden/Documents/Code/AI_Agents/DayAgent/pdfs' folder'
+### Installation
+```bash
+# Clone the repository
+git clone <your-repo-url>
+cd DayAgent
 
-## Gmail
+# Install dependencies using uv
+uv sync
 
+# Install MCP dependencies
+npm install -g @cocal/google-calendar-mcp
+npm install -g @gongrzhe/server-gmail-autoauth-mcp
 
-show me the raw output you get when you query about the email with message id: 1995d921db9f08b9'. Give it to me in the exakt form the MCP tool gives you
+# Set up environment variables
+cp .env.example .env
+# Edit .env with your API keys and credentials
 
-## Google Maps
+# Configure MCP servers
+# Edit app/mcp_config.json with your settings
 
+# Set up user configuration
+# Edit app/user_conf/config.json with your personal details
+```
+
+### Running the Agent
+```bash
+# Activate the virtual environment
+source .venv/bin/activate
+
+# Run the agent
+python -m app.bot
+```
+
+## 🔐 Authentication & Security
+
+### Google OAuth Setup
+The Google Calendar and Gmail integrations require proper OAuth2 credentials:
+1. Set up Google Cloud Console project
+2. Enable Google Calendar API and Gmail API
+3. Create OAuth2 credentials
+4. Configure OAuth consent screen
+5. Store credentials in `app/google_keys.json`
+
+### API Keys
+Required API keys for different services:
+- Google Maps API key for transportation routing
+- WeatherXM Pro API key for weather data
+- MCP server environment variables
+
+## 🎯 Features
+
+### ✅ Implemented
+- Calendar event retrieval with location integration
+- Email fetching with formatting
+- Public transportation routing calculations
+- Weather forecast gathering
+- Markdown template rendering
+- Data persistence in JSON format
+
+### 🔄 In Progress
+- PDF generation from markdown
+- Email delivery system
+- Advanced error handling and retries
+- Configuration validation
+- Unit testing
+
+### 🚀 Planned
+- Mobile app notifications
+- Web dashboard interface
+- Machine learning insights
+- Third-party calendar integration
+- Voice assistant integration
+
+## 🐛 Error Handling
+
+The system includes comprehensive error handling for:
+- MCP server connection failures
+- API rate limiting
+- Authentication issues
+- Missing data scenarios
+- Template rendering errors
+
+## 📊 Output Examples
+
+### Daily Brief Format
+```markdown
+# Daily Brief - 2025-10-08
+
+## 📅 Today's Schedule
+
+**10:15**: Team Meeting
+  - Location: Stockholm Office
+  - Travel: Walk 5 minutes → Bus 143
+----------------------------------
+
+**17:30**: Yoga Class
+  - Location: Fitness Center
+  - Travel: Arrive by 17:20
+----------------------------------
+
+## Todays Weather Forcast.
+
+- **12:00**: 13.35°C, precipitation 0.02mm
+- **13:00**: 14.05°C, precipitation 0.05mm
+- **14:00**: 14.55°C, precipitation 0.07mm
+
+## 📧 Unread Emails.
+
+- [Meeting Reminder](Please join our 2 PM meeting) - Boss <boss@company.com>
+- [Package Delivered](Your order has arrived) - Amazon <no-reply@amazon.com>
+```
+
+## 🤝 Contributing
+
+Contributions are welcome! Please read our contributing guidelines and submit pull requests for:
+- New MCP server integrations
+- Template improvements
+- Performance optimizations
+- Documentation enhancements
+
+## 📜 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 🙏 Acknowledgments
+
+- Built with LangChain and LangGraph
+- Powered by Google's Gemini AI
+- Utilizing multiple advanced MCP servers
+- Special thanks to the MCP ecosystem contributors
+
+---
+
+*DayAgent - Your intelligent daily companion that keeps you informed and organized.*

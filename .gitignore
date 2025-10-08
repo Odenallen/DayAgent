@@ -12,3 +12,9 @@ oauth_generator.py
 .env
 app/google_keys.json
 app/token.json
+app/mcp_config.json
+app/my_mcp.py
+app/graph.py
+app/client.py
+pdfs/markdown2pdf-test.pdf
+Plans
