@@ -1,0 +1,189 @@
+{
+  "name": "Oden",
+  "location": "Stockholm",
+  "work_location": [
+    {
+      "address": "R\u00e5stav\u00e4gen 3",
+      "city": "Solna",
+      "postal code": "169 54"
+    }
+  ],
+  "home_location": [
+    {
+      "address": "Kungsholms Strand 159",
+      "city": "Stockholm",
+      "postal code": "112 48",
+      "latitude": 59.3382069,
+      "longitude": 18.0258636
+    }
+  ],
+  "dentist_location": [
+    {
+      "address": null,
+      "city": null,
+      "postal code": null
+    }
+  ],
+  "calendar_events": [
+    {
+      "Event_id": "_8gpk4ca188s46ba48p238b9k6gp3cb9o8gpk2ba46l1jadpk8h2k6e236c",
+      "summary": "Mattias Jobba",
+      "start": "2025-10-02T10:15:00+02:00",
+      "end": "2025-10-02T11:15:00+02:00",
+      "view": "",
+      "location": "R\u00e5stav\u00e4gen 3\n169 54 Solna, Sverige"
+    },
+    {
+      "Event_id": "5l1uraj9fdhvn0n8q4717mi75c",
+      "summary": "T1 Calendar",
+      "start": "2025-10-02T16:30:00+02:00",
+      "end": "2025-10-02T17:30:00+02:00",
+      "view": "",
+      "location": "Stockholm, Sverige"
+    },
+    {
+      "Event_id": "4htgrk8os48abtpkqfbkf6v7o8",
+      "summary": "t2 calendar",
+      "start": "2025-10-02T17:00:00+02:00",
+      "end": "2025-10-02T19:00:00+02:00",
+      "view": "",
+      "location": "Uddevalla, Sverige"
+    },
+    {
+      "Event_id": "it6p62uuqmsjopjci0vdb3sor0",
+      "summary": "The Sacred Session at Sacred Sauna",
+      "start": "2025-10-02T18:30:00+02:00",
+      "end": "2025-10-02T19:30:00+02:00",
+      "view": "",
+      "location": "Sacred Sauna"
+    }
+  ],
+  "transportation_list": [
+    {
+      "info": "From: Kungsholms Strand 159, Stockholm\nTo: R\u00e5stav\u00e4gen 3, 169 54 Solna, Sverige\nMode: Public Transportation\n\nRoute 1:\n- Departure Time: Now\n- Arrival Time: 27 minutes from now\n- Total Travel Duration: 27 minutes\n- Transit Lines/Routes:\n  - Walk to Stadshagen (12 minutes)\n  - Subway towards Akalla (6 minutes)\n  - Walk to R\u00e5stav\u00e4gen 3, 169 54 Solna, Sweden (9 minutes)"
+    },
+    {
+      "info": "From: R\u00e5stav\u00e4gen 3, 169 54 Solna, Sverige\nTo: Stockholm, Sverige\nMode: Public Transportation\n\nRoute 1:\n- Departure Time: Now\n- Arrival Time: 20 minutes from now\n- Total Travel Duration: 20 minutes\n- Transit Lines/Routes:\n  - Walk to \u00d6sterv\u00e4gen (4 minutes)\n  - Bus towards Solna centrum (7 minutes)\n  - Walk to Solna centrum (1 minute)\n  - Bus towards Blackebergs g\u00e5rd (5 minutes)"
+    },
+    {
+      "info": "From: Stockholm, Sverige\nTo: Uddevalla, Sverige\nMode: Public Transportation\n\nRoute 1:\n- Departure Time: Now\n- Arrival Time: 4 hours 13 minutes from now\n- Total Travel Duration: 4 hours 13 minutes\n- Transit Lines/Routes:\n  - High speed train towards G\u00f6teborg Centralstation (2 hours 42 mins)\n  - Train towards Uddevalla Centralstation (1 hour 22 mins)"
+    },
+    {
+      "info": "From: Uddevalla, Sverige\nTo: Sacred Sauna\nMode: Public Transportation\n\nRoute 1:\n- Departure Time: Now\n- Arrival Time: 1 day 3 hours from now\n- Total Travel Duration: 1 day 3 hours\n- Transit Lines/Routes:\n  - Bus towards G\u00f6teborg Nils Ericsonterminal (1 hour 15 mins)\n  - Walk to Gothenburg Central Station (2 mins)\n  - High speed train towards Malm\u00f6 Centralstation (2 hours 30 mins)\n  - Walk to Malmo Norra Vallgatan (3 mins)\n  - Bus towards Paris Bercy Central Bus Station (11 hours 20 mins)\n  - Walk to Arnhem Central (1 min)\n  - Train towards Den Helder (37 mins)\n  - Walk to Utrecht Centraal (1 min)\n  - Train towards Dordrecht (31 mins)\n  - High speed train towards Paris-Nord (1 hour 39 mins)\n  - Walk to Brussels Midi Train Station (2 mins)\n  - High speed train towards London St Pancras Int'l (2 hours 6 mins)\n  - Walk to King's Cross St. Pancras (3 mins)\n  - Subway towards Hammersmith (10 mins)\n  - Walk to Paddington (2 mins)\n  - Train towards Penzance (1 hour 41 mins)\n  - Walk to Taunton Station South Side (2 mins)\n  - Bus towards Langley Corner, Bus (33 mins)\n  - Walk to Winkley House Studio, Fore St, Milverton, Taunton TA4 1JU, UK (4 mins)"
+    }
+  ],
+  "new_email": [
+    {
+      "subject": "Work",
+      "sender": "Oden Allen <oden.allen@gmail.com>",
+      "summary": "Work. No preview available."
+    },
+    {
+      "subject": "\ud83d\udca1\ud83e\udde0 What makes you, you?",
+      "sender": "Lumosity <newsletter@notifications.lumosity.com>",
+      "summary": "\ud83d\udca1\ud83e\udde0 What makes you, you? No preview available."
+    },
+    {
+      "subject": "Ett f\u00f6rtvivlat fint erbjudande \u2013 1 m\u00e5nad f\u00f6r 9 kr \ud83d\udcda",
+      "sender": "BookBeat <team@news.bookbeat.com>",
+      "summary": "Ett f\u00f6rtvivlat fint erbjudande \u2013 1 m\u00e5nad f\u00f6r 9 kr \ud83d\udcda. No preview available."
+    },
+    {
+      "subject": "\u201csoftware engineer\u201d: Generate - AI Backend Developer and more",
+      "sender": "LinkedIn Job Alerts <jobalerts-noreply@linkedin.com>",
+      "summary": "\u201csoftware engineer\u201d: Generate - AI Backend Developer and more. No preview available."
+    },
+    {
+      "subject": "Deploja AB: 4 nya jobb matchar din profil",
+      "sender": "Deploja AB <no-reply@deplojaab.teamtailor-mail.com>",
+      "summary": "Deploja AB: 4 nya jobb matchar din profil. No preview available."
+    },
+    {
+      "subject": "\u201csoftware engineer\u201d: Solita - AI Developer \u2013 Stockholm and more",
+      "sender": "LinkedIn Job Alerts <jobalerts-noreply@linkedin.com>",
+      "summary": "\u201csoftware engineer\u201d: Solita - AI Developer \u2013 Stockholm and more. No preview available."
+    },
+    {
+      "subject": "Ditt paket \u00e4r p\u00e5 v\u00e4g fr\u00e5n Jollyroom.se",
+      "sender": "\"Jollyroom.se\" <no-reply@jollyroom.se>",
+      "summary": "Ditt paket \u00e4r p\u00e5 v\u00e4g fr\u00e5n Jollyroom.se. No preview available."
+    },
+    {
+      "subject": "P\u00e5minnelse: Obetald elfaktura fr\u00e5n Greenely",
+      "sender": "No reply <noreply@delivery.payex.com>",
+      "summary": "P\u00e5minnelse: Obetald elfaktura fr\u00e5n Greenely. No preview available."
+    },
+    {
+      "subject": "Veckans erbjudanden i din butik",
+      "sender": "Coop <info@e.coop.se>",
+      "summary": "Veckans erbjudanden i din butik. No preview available."
+    },
+    {
+      "subject": "1 LAST Chance To Receive 2 Rewards After Your Getaway \ud83c\udfd6\ufe0f",
+      "sender": "Hilton Grand Vacations <hgv@travel.hiltongrandvacations.com>",
+      "summary": "1 LAST Chance To Receive 2 Rewards After Your Getaway \ud83c\udfd6\ufe0f. No preview available."
+    }
+  ],
+  "weather": [
+    {
+      "hour": "12:00",
+      "temperature": "13.35",
+      "precipitation": "0.02"
+    },
+    {
+      "hour": "13:00",
+      "temperature": "14.05",
+      "precipitation": "0.05"
+    },
+    {
+      "hour": "14:00",
+      "temperature": "14.55",
+      "precipitation": "0.07"
+    },
+    {
+      "hour": "15:00",
+      "temperature": "14.82",
+      "precipitation": "0.06"
+    },
+    {
+      "hour": "16:00",
+      "temperature": "14.89",
+      "precipitation": "0.05"
+    },
+    {
+      "hour": "17:00",
+      "temperature": "14.62",
+      "precipitation": "0.03"
+    },
+    {
+      "hour": "18:00",
+      "temperature": "13.79",
+      "precipitation": "0.02"
+    },
+    {
+      "hour": "19:00",
+      "temperature": "12.62",
+      "precipitation": "0.01"
+    },
+    {
+      "hour": "20:00",
+      "temperature": "11.59",
+      "precipitation": "0.00"
+    },
+    {
+      "hour": "21:00",
+      "temperature": "10.88",
+      "precipitation": "0.00"
+    },
+    {
+      "hour": "22:00",
+      "temperature": "10.31",
+      "precipitation": "0.00"
+    },
+    {
+      "hour": "23:00",
+      "temperature": "9.81",
+      "precipitation": "0.00"
+    }
+  ]
+}

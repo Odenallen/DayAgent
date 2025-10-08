@@ -2,21 +2,20 @@
 
 ## 📅 Today's Schedule
 {% for event in calendar_events %}
-- **{{ event.start_time }}**: {{ event.title }}
+
+**{{ event.start_time }}**: {{ event.summary }}
   - Location: {{ event.location }}
-  - Travel: {{ event.travel_instructions }}
+      - Travel: {{ event.transportation }}
+----------------------------------
+{% endfor %}
+## Todays Weather Forcast.
+
+{% for hour_data in weather %}
+- **{{ hour_data.hour }}**: {{ hour_data.temperature }}°C, precipitation {{ hour_data.precipitation }}mm
 {% endfor %}
 
-## 🌤️ Weather & Clothing
-- **Forecast**: {{ weather.summary }}
-- **Suggested outfit**: {{ clothing_suggestion }}
-
-## 📧 Yesterday's New Emails
-{% for email in emails %}
-- [{{ email.subject }}]({{ email.link }}) - {{ email.sender }}
+## 📧 Unread Emails.
+{% for email in new_email %}
+- [{{ email.subject }}]({{ email.summary }}) - {{ email.sender }}
 {% endfor %}
 
-## ✅ Reminders Created
-{% for task in tasks %}
-- {{ task.title }} (Due: {{ task.due_time }})
-{% endfor %}
