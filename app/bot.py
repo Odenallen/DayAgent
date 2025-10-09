@@ -5,8 +5,7 @@ import datetime
 from langchain_core.tools import tool
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import StateGraph,END
-from classStructs import MDdata,CalendarList,Transportation,MailList,LocationCoordinates,Weather,BooleanResponse,WeatherInfo
-from my_mcp import mcp_config
+from app.classStructs import MDdata,CalendarList,Transportation,MailList,LocationCoordinates,Weather,BooleanResponse,WeatherInfo
 
 from dotenv import load_dotenv
 from langchain_mcp_adapters.client import MultiServerMCPClient
@@ -14,7 +13,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langgraph.prebuilt import create_react_agent
 from langchain_core.messages import HumanMessage
 from typing import Dict,TypedDict,List
-from templates.prompts import calendar_prompt_format,calendar_prompt2,transportation_prompt,email_prompt,email_format_prompt,weather_prompt,transport_response_checker,locToGeo_msg
+from app.templates.prompts import calendar_prompt_format,calendar_prompt2,transportation_prompt,email_prompt,email_format_prompt,weather_prompt,transport_response_checker,locToGeo_msg
 
 from jinja2 import Environment, FileSystemLoader, Template
 class DayAgentState(TypedDict):
@@ -62,6 +61,9 @@ class DayAgent():
         graph.add_edge("generate_md",END)
 
 
+        # graph.set_entry_point("Load config node")
+        # graph.add_edge("Load config node","generate_md")
+        # graph.add_edge("generate_md",END)
 
         memory = MemorySaver()
 
@@ -93,6 +95,7 @@ class DataCollector:
         self.config = None              # Maybe strange Init value, look at later 
         self.llmConfig = None
         self.data = None
+        self.base_path = os.path.dirname(__file__)
 
     async def setLLM(self,new_model=False,response_format=None):
         """
@@ -103,8 +106,9 @@ class DataCollector:
         """
         
         print("\nMade it into method: DataCollector.setLLM\n")
-
-        with open ("mcp_config.json",'r') as f:
+        load_dotenv()
+        config_mcp = os.path.join(self.base_path,"mcp_config.json")
+        with open (config_mcp,'r') as f:
             mcp_config = json.load(f)
 
         client = MultiServerMCPClient(connections=mcp_config['mcpServers'])
@@ -428,11 +432,22 @@ class ContentProcessor:
         """ This method loads the template that will be populated"""
 
         print(" \nMade it into method: content_processor.load_template_from_file\n")
+        # Get absolute path to template directory
+        current_file = os.path.abspath(__file__)  # Get path to bot.py
 
-        template_dir = os.path.dirname("templates/email-template.md")
-        template_name = os.path.basename("templates/email-template.md")
+        app_dir = os.path.dirname(current_file)   # Get app directory
 
+        template_dir = os.path.join(app_dir, "templates")
+        template_name = "email-template.md"
+        
+        
+        # Check if template exists
+        template_path = os.path.join(template_dir, template_name)
+        if not os.path.exists(template_path):
+            raise FileNotFoundError(f"Template not found: {template_path}")
+        
         env = Environment(loader=FileSystemLoader(template_dir))
+        exit()
         return env.get_template(template_name)
 
 

@@ -17,18 +17,22 @@ MCP (Model Context Protocol) servers are specialized services that provide tools
 1. **Google Calendar MCP Server** (`@cocal/google-calendar-mcp`)
    - Purpose: Fetches your calendar events for today
    - Provides: Event details including times, locations, and descriptions
+   - Auth: Requires `google_keys.json` and `token.json` for OAuth2
 
 2. **Google Maps MCP Server** (`mcp/google-maps`)
    - Purpose: Calculates public transportation routes and travel times
    - Provides: Transit directions, travel durations, and route details
+   - Auth: Requires Google Maps API key
 
 3. **Gmail MCP Server** (`@gongrzhe/server-gmail-autoauth-mcp`)
    - Purpose: Retrieves your daily unread emails
    - Provides: Email subjects, senders, and brief content summaries
+   - Auth: Uses auto-authentication with Google credentials
 
 4. **Weather MCP Server** (`weatherxm-pro`)
    - Purpose: Fetches accurate weather forecasts
    - Provides: Hourly temperature and precipitation data
+   - Auth: Requires WeatherXM Pro API key
 
 5. **Time MCP Server** (`mcp-server-time`)
    - Purpose: Handles timezone conversions and date/time operations
@@ -37,6 +41,7 @@ MCP (Model Context Protocol) servers are specialized services that provide tools
 6. **Markdown-to-PDF MCP Server** (`md-pdf-mcp`)
    - Purpose: Converts generated markdown reports to PDF format
    - Provides: Document generation capabilities
+   - Setup: Requires local MCP server installation
 
 ## 📁 File Structure
 
@@ -51,13 +56,16 @@ DayAgent/
 │   ├── templates/
 │   │   ├── email-template.md  # Jinja2 template for daily briefs
 │   │   └── prompts.py         # LLM prompts for different tasks
-│   └── mcp_config.json        # MCP server definitions and settings
+│   ├── mcp_config.json        # MCP server definitions and settings
+│   ├── google_keys.json       # Google OAuth2 credentials
+│   └── token.json            # Google authentication tokens
 ├── result/
 │   ├── results.json           # Generated data from each run
 │   └── generatedMD.md       # Final markdown output
-├── main.py                    # Entry point (simple print statement)
-├── pyproject.toml            # Project dependencies
+├── main.py                    # Entry point - runs async bot main function
+├── pyproject.toml            # Project dependencies (using uv)
 ├── uv.lock                   # Locked dependencies
+├── .python-version          # Python version specification
 └── .gitignore               # Git ignore rules
 ```
 
@@ -76,6 +84,10 @@ DayAgent/
     "default_meeting_location": null
 }
 ```
+
+### Authentication Files
+- **Google OAuth Credentials** (`app/google_keys.json`): OAuth2 client credentials from Google Cloud Console
+- **Google Auth Token** (`app/token.json`): Generated authentication tokens (auto-created after first login)
 
 ### MCP Server Configuration (`app/mcp_config.json`)
 The MCP servers are configured with specific environment variables, API keys, and OAuth credentials. Each server requires appropriate authentication tokens and API keys to function properly.
@@ -157,11 +169,11 @@ cp .env.example .env
 
 ### Running the Agent
 ```bash
-# Activate the virtual environment
-source .venv/bin/activate
+# Install dependencies using uv
+uv sync
 
 # Run the agent
-python -m app.bot
+python main.py
 ```
 
 ## 🔐 Authentication & Security
@@ -170,9 +182,18 @@ python -m app.bot
 The Google Calendar and Gmail integrations require proper OAuth2 credentials:
 1. Set up Google Cloud Console project
 2. Enable Google Calendar API and Gmail API
-3. Create OAuth2 credentials
-4. Configure OAuth consent screen
-5. Store credentials in `app/google_keys.json`
+3. Create OAuth2 credentials for a web application
+4. Configure OAuth consent screen with appropriate scopes
+5. Store credentials in `app/google_keys.json` in the format:
+```json
+{
+  "installed": {
+    "client_id": "your-client-id",
+    "client_secret": "your-client-secret"
+  }
+}
+```
+6. On first run, you'll be prompted to authorize via browser - credentials are saved to `app/token.json`
 
 ### API Keys
 Required API keys for different services:
@@ -183,26 +204,16 @@ Required API keys for different services:
 ## 🎯 Features
 
 ### ✅ Implemented
-- Calendar event retrieval with location integration
-- Email fetching with formatting
-- Public transportation routing calculations
-- Weather forecast gathering
-- Markdown template rendering
+- Calendar event retrieval with location integration and smart formatting
+- Email fetching with content formatting and filtering
+- Public transportation routing with detailed instructions
+- Weather forecast gathering with hourly data
+- Markdown template rendering with Jinja2
 - Data persistence in JSON format
+- Async/await architecture for better performance
+- LangGraph-based workflow orchestration
 
-### 🔄 In Progress
-- PDF generation from markdown
-- Email delivery system
-- Advanced error handling and retries
-- Configuration validation
-- Unit testing
 
-### 🚀 Planned
-- Mobile app notifications
-- Web dashboard interface
-- Machine learning insights
-- Third-party calendar integration
-- Voice assistant integration
 
 ## 🐛 Error Handling
 
@@ -217,31 +228,37 @@ The system includes comprehensive error handling for:
 
 ### Daily Brief Format
 ```markdown
-# Daily Brief - 2025-10-08
+# Daily Brief - 2025-10-09
 
 ## 📅 Today's Schedule
+
+****: Take care of Mom
+  - Location: Bjulevägen 19, 122 41 Enskede, Sverige
+  - Travel: **Route 1:**
+*   **Departure:** Kungsholms Strand 159, Stockholm
+*   **Arrival:** Bjulevägen 19, 122 41 Enskede, Sverige
+*   **Total Travel Time:** 52 minutes
+*   **Instructions:**
+    1.  Walk to S:t Eriksplan (14 mins, 0.9 km)
+    2.  Take the Subway towards Hagsätra (23 mins, 10.1 km)
+    3.  Walk to Bjulevägen 19, 122 41 Enskede, Sweden (15 mins, 1.1 km)
 
 **10:15**: Team Meeting
   - Location: Stockholm Office
   - Travel: Walk 5 minutes → Bus 143
-----------------------------------
 
-**17:30**: Yoga Class
-  - Location: Fitness Center
-  - Travel: Arrive by 17:20
-----------------------------------
+## Todays Weather Forecast.
 
-## Todays Weather Forcast.
-
-- **12:00**: 13.35°C, precipitation 0.02mm
-- **13:00**: 14.05°C, precipitation 0.05mm
-- **14:00**: 14.55°C, precipitation 0.07mm
+- **11:00**: 10.92°C, precipitation 0mm
+- **12:00**: 12.01°C, precipitation 0mm
+- **13:00**: 13.00°C, precipitation 0mm
 
 ## 📧 Unread Emails.
 
-- [Meeting Reminder](Please join our 2 PM meeting) - Boss <boss@company.com>
-- [Package Delivered](Your order has arrived) - Amazon <no-reply@amazon.com>
-```
+- [SMR-boom article](Article about nuclear technology) - Ny Teknik Premium
+- [Job alerts](New job postings) - LinkedIn Job Alerts
+- [Daily.dev update](Personal update) - daily.dev
+- [SALE notification](Up to 60% off) - ARKET
 
 ## 🤝 Contributing
 
