@@ -10,11 +10,21 @@ oauth_generator.py
 # Virtual environments
 .venv
 .env
+
+# Sensitive files
 app/google_keys.json
 app/token.json
 app/mcp_config.json
+
+# Development files
 app/my_mcp.py
 app/graph.py
 app/client.py
 pdfs/markdown2pdf-test.pdf
 Plans
+
+# Docker
+.dockerignore
+
+# BUT track example configs
+!config.example/

@@ -1,0 +1,9 @@
+dotenv
+jinja2
+langchain
+langchain-google-genai
+langchain-mcp-adapters
+langgraph
+mcp-weather-server
+nodejs
+python-dateutil

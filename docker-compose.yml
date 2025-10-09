@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  dayagent:
+    build: .
+    container_name: dayagent
+    volumes:
+      - ./app/google_keys.json:/app/app/google_keys.json:ro
+      - ./app/token.json:/app/app/token.json:ro
+      - ./app/mcp_config.json:/app/app/mcp_config.json:ro
+      - ./result:/app/result
+      - ./pdfs:/app/pdfs
+      # Mount Docker socket to use host's Docker
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped

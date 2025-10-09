@@ -1,0 +1,156 @@
+{
+  "name": "Oden",
+  "location": "Stockholm",
+  "work_location": [
+    {
+      "address": "R\u00e5stav\u00e4gen 3",
+      "city": "Solna",
+      "postal code": "169 54"
+    }
+  ],
+  "home_location": [
+    {
+      "address": "Kungsholms Strand 159",
+      "city": "Stockholm",
+      "postal code": "112 48",
+      "latitude": 59.3382069,
+      "longitude": 18.0258636
+    }
+  ],
+  "dentist_location": [
+    {
+      "address": null,
+      "city": null,
+      "postal code": null
+    }
+  ],
+  "calendar_events": [
+    {
+      "Event_id": "_6go3ce1p6spj6b9l6go3cb9k70s34b9o6d1j2b9h8gq44ca38cq3icph8g",
+      "summary": "Ta hand om Mamma",
+      "start": "2025-10-08T10:00:00+02:00",
+      "end": "2025-10-10T11:00:00+02:00",
+      "view": "https://www.google.com/calendar/event?eid=XzZnbzNjZTFwNnNwajZiOWw2Z28zY2I5azcwczM0YjlvNmQxajJiOWg4Z3E0NGNhMzhjcTNpY3BoOGcgb2Rlbi5hbGxlbkBt",
+      "location": "Bjulev\u00e4gen 19, 122 41 Enskede, Sverige"
+    },
+    {
+      "Event_id": "0duqmdr8gv8t3knr22nhhv5aad",
+      "summary": "Work",
+      "start": "2025-10-09T16:00:00+02:00",
+      "end": "2025-10-09T17:00:00+02:00",
+      "view": "https://www.google.com/calendar/event?eid=MGR1cW1kcjhndjh0M2tucjIybmhodjVhYWQgb2Rlbi5hbGxlbkBt",
+      "location": "R\u00e5stav\u00e4gen 3, 169 54 Solna, Sverige"
+    },
+    {
+      "Event_id": "019bdgi3l8mg0no13grg1jg38b",
+      "summary": "Tr\u00e4ffa Jeremy",
+      "start": "2025-10-09T23:30:00+02:00",
+      "end": "2025-10-10T00:00:00+02:00",
+      "view": "https://www.google.com/calendar/event?eid=MDE5YmRnaTNsOG1nMG5vMTNncmcxamczOGIgb2Rlbi5hbGxlbkBt",
+      "location": "Gotlandsgatan 7, 116 65 Stockholm, Sverige"
+    }
+  ],
+  "transportation_list": [
+    {
+      "info": "**Route 1:**\n\n*   **Departure:** Kungsholms Strand 159, Stockholm\n*   **Arrival:** Bjulev\u00e4gen 19, 122 41 Enskede, Sverige\n*   **Total Travel Time:** 52 minutes\n*   **Instructions:**\n    1.  Walk to S:t Eriksplan (14 mins, 0.9 km)\n    2.  Take the Subway towards Hags\u00e4tra (23 mins, 10.1 km)\n    3.  Walk to Bjulev\u00e4gen 19, 122 41 Enskede, Sweden (15 mins, 1.1 km)"
+    },
+    {
+      "info": "**Route 1:**\n\n*   **Departure:** Bjulev\u00e4gen 19, 122 41 Enskede, Sverige\n*   **Arrival:** R\u00e5stav\u00e4gen 3, 169 54 Solna, Sverige\n*   **Total Travel Time:** 58 minutes\n*   **Instructions:**\n    1.  Walk to Tystbergav\u00e4gen (4 mins, 0.3 km)\n    2.  Take the Bus towards Bred\u00e4ng (13 mins, 3.3 km)\n    3.  Walk to \u00c4lvsj\u00f6 (1 min, 82 m)\n    4.  Take the Train towards Uppsala C (18 mins, 13.0 km)\n    5.  Walk to Solna station (1 min, 50 m)\n    6.  Take the Bus towards Sundbybergs station (3 mins, 1.1 km)\n    7.  Walk to R\u00e5stav\u00e4gen 3, 169 54 Solna, Sweden (2 mins, 0.2 km)"
+    },
+    {
+      "info": "**Route 1:**\n\n*   **Departure:** R\u00e5stav\u00e4gen 3, 169 54 Solna, Sverige\n*   **Arrival:** Gotlandsgatan 7, 116 65 Stockholm, Sverige\n*   **Total Travel Time:** 36 minutes\n*   **Instructions:**\n    1.  Walk to N\u00e4ckrosen (Solna) (10 mins, 0.7 km)\n    2.  Take the Subway towards Kungstr\u00e4dg\u00e5rden (12 mins, 6.9 km)\n    3.  Walk to T-Centralen (2 mins, 0.1 km)\n    4.  Take the Subway towards Hags\u00e4tra (6 mins, 2.9 km)\n    5.  Walk to Gotlandsgatan 7, 116 65 Stockholm, Sweden (4 mins, 0.3 km)"
+    },
+    {
+      "info": "**Route 1:**\n\n*   **Departure:** Gotlandsgatan 7, 116 65 Stockholm, Sverige\n*   **Arrival:** Kungsholms Strand 159, Stockholm\n*   **Total Travel Time:** 30 minutes\n*   **Instructions:**\n    1.  Walk to Skanstull (4 mins, 0.3 km)\n    2.  Take the Subway towards H\u00e4sselby strand (13 mins, 5.5 km)\n    3.  Walk to Kungsholms strand 159, 112 48 Stockholm, Sweden (13 mins, 1.0 km)"
+    }
+  ],
+  "new_email": [
+    {
+      "subject": "SMR-boom f\u00e5r v\u00e4rlden att v\u00e4nda sig till Sandviken \u2022 Turbinkluster ska ge mer el \u2013 men en fr\u00e5ga kvarst\u00e5r",
+      "sender": "Ny Teknik Premium <editor@premium.newsletter.nyteknik.se>",
+      "summary": "SMR-boom f\u00e5r v\u00e4rlden att v\u00e4nda sig till Sandviken. Turbinkluster ska ge mer el \u2013 men en fr\u00e5ga kvarst\u00e5r."
+    },
+    {
+      "subject": "\u201csoftware engineer\u201d: Dibbla AB - AI Engineer / Fullstack and more",
+      "sender": "LinkedIn Job Alerts <jobalerts-noreply@linkedin.com>",
+      "summary": "\u201csoftware engineer\u201d: Dibbla AB - AI Engineer / Fullstack and more. This is a job alert from LinkedIn."
+    },
+    {
+      "subject": "Oden, your personal update from daily.dev is ready",
+      "sender": "\"daily.dev\" <informer@daily.dev>",
+      "summary": "Oden, your personal update from daily.dev is ready. This is a personal update."
+    },
+    {
+      "subject": "SALE \u2013 UP TO 60% OFF",
+      "sender": "ARKET <news@e.arket.com>",
+      "summary": "SALE \u2013 UP TO 60% OFF. This email is about a sale from ARKET."
+    }
+  ],
+  "weather": [
+    {
+      "hour": "11:00",
+      "temperature": "10.92",
+      "precipitation": "0"
+    },
+    {
+      "hour": "12:00",
+      "temperature": "12.01",
+      "precipitation": "0"
+    },
+    {
+      "hour": "13:00",
+      "temperature": "13.00",
+      "precipitation": "0"
+    },
+    {
+      "hour": "14:00",
+      "temperature": "13.63",
+      "precipitation": "0"
+    },
+    {
+      "hour": "15:00",
+      "temperature": "13.70",
+      "precipitation": "0"
+    },
+    {
+      "hour": "16:00",
+      "temperature": "13.41",
+      "precipitation": "0"
+    },
+    {
+      "hour": "17:00",
+      "temperature": "13.01",
+      "precipitation": "0"
+    },
+    {
+      "hour": "18:00",
+      "temperature": "12.56",
+      "precipitation": "0.03"
+    },
+    {
+      "hour": "19:00",
+      "temperature": "12.00",
+      "precipitation": "0.07"
+    },
+    {
+      "hour": "20:00",
+      "temperature": "11.46",
+      "precipitation": "0.10"
+    },
+    {
+      "hour": "21:00",
+      "temperature": "10.99",
+      "precipitation": "0.10"
+    },
+    {
+      "hour": "22:00",
+      "temperature": "10.54",
+      "precipitation": "0.09"
+    },
+    {
+      "hour": "23:00",
+      "temperature": "10.10",
+      "precipitation": "0.07"
+    }
+  ]
+}
