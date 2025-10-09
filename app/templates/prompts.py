@@ -119,3 +119,10 @@ weather_prompt = """
 
 transport_response_checker="""You are my personal assistant who need to check if a previous LLM answer is a public transport directions.
                 I want you to answer me in a boolean format. True if its a valid answer, False if its not valid.\n LLM answer: {answer}"""
+
+
+locToGeo_msg= """I would like for you to give me a geocode from a location.\n
+        Address: {address}, {postal_code} in {city}
+                
+                
+                """

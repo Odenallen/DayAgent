@@ -5,7 +5,7 @@ import datetime
 from langchain_core.tools import tool
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import StateGraph,END
-from classStructs import MDdata,Mail,CalendarList,Transportation,CalendarResponse,MailList,LocationCoordinates,Weather,BooleanResponse,WeatherInfo
+from classStructs import MDdata,CalendarList,Transportation,MailList,LocationCoordinates,Weather,BooleanResponse,WeatherInfo
 from my_mcp import mcp_config
 
 from dotenv import load_dotenv
@@ -14,7 +14,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langgraph.prebuilt import create_react_agent
 from langchain_core.messages import HumanMessage
 from typing import Dict,TypedDict,List
-from templates.prompts import calendar_prompt_format,calendar_prompt2,transportation_prompt,email_prompt,email_format_prompt,weather_prompt,transport_response_checker
+from templates.prompts import calendar_prompt_format,calendar_prompt2,transportation_prompt,email_prompt,email_format_prompt,weather_prompt,transport_response_checker,locToGeo_msg
 
 from jinja2 import Environment, FileSystemLoader, Template
 class DayAgentState(TypedDict):
@@ -24,7 +24,6 @@ class DayAgent():
     def __init__(self):
         self.data_collector = DataCollector()
         self.content_processor = ContentProcessor()
-        self.pdf_gen = PDFGenerator()
         self.graph =self._build_graph()
 
 
@@ -51,23 +50,16 @@ class DayAgent():
         
         
         # Edges
-        # graph.set_entry_point("Load config node")
-        # graph.add_edge("Load config node","Calendar_node")
-        # graph.add_conditional_edges("Calendar_node",self.data_collector.events_exist,{True:"transportation_node",False:"mail_node"})
-        # graph.add_edge("transportation_node","mail_node")
-        # 
-        # graph.add_edge("mail_node","Location->GeoCord_node")
-        # graph.add_edge("Location->GeoCord_node","weather_node")
-        # graph.add_edge("weather_node","saving_json_node")
-        # graph.add_edge("saving_json_node",END)
-
-
-
         graph.set_entry_point("Load config node")
-        graph.add_edge("Load config node","generate_md")
+        graph.add_edge("Load config node","Calendar_node")
+        graph.add_conditional_edges("Calendar_node",self.data_collector.events_exist,{True:"transportation_node",False:"mail_node"})
+        graph.add_edge("transportation_node","mail_node")
+        
+        graph.add_edge("mail_node","Location->GeoCord_node")
+        graph.add_edge("Location->GeoCord_node","weather_node")
+        graph.add_edge("weather_node","saving_json_node")
+        graph.add_edge("saving_json_node","generate_md")
         graph.add_edge("generate_md",END)
-
-
 
 
 
@@ -203,9 +195,6 @@ class DataCollector:
         if agent_response["structured_response"].events != []:
             self.config["calendar_events"] = agent_response["structured_response"].events
         
-        # print(self.config["calendar_events"])
-        # print(agent_response["structured_response"].events)
-
         return state    
         
 
@@ -296,13 +285,9 @@ class DataCollector:
         
         # Model call
         formatted_agent_response = await response_formatted_model.ainvoke({"messages": [HumanMessage(content=formatted_email_format_prompt)]},config=self.llmConfig)
-        # print(f"formatted msg: {msg_formated}\n")
-        # print(f"First response: {agent_response['messages'][-1].content}")
-        # print(f"Answer: {formatted_agent_response['structured_response']}\n")
-
+        
         # Setting new emails
         self.config["new_email"] = formatted_agent_response["structured_response"]
-        # print(self.config)
 
 
     async def locToGeocode(self,state:DayAgentState):
@@ -313,26 +298,24 @@ class DataCollector:
 
         """
 
-        # self.config = {'name': 'Oden', 'location': 'Stockholm', 'work_location': [{'address': 'Råstavägen 3', 'city': 'Solna', 'postal code': '169 54'}], 'home_location': [{'address': 'Kungsholms Strand 159', 'city': 'Stockholm', 'postal code': '112 48'}], 'dentist_location': [{'address': None, 'city': None, 'postal code': None}], 'calendar_events': CalendarList(events=[CalendarResponse(Event_id='_8gpk4ca188s46ba48p238b9k6gp3cb9o8gpk2ba46l1jadpk8h2k6e236c', summary='Mattias Jobba', start='2025-10-02T10:15:00+02:00', end='2025-10-02T11:15:00+02:00', view='', location='Råstavägen 3\n169 54 Solna, Sverige'), CalendarResponse(Event_id='5l1uraj9fdhvn0n8q4717mi75c', summary='T1 Calendar', start='2025-10-02T16:30:00+02:00', end='2025-10-02T17:30:00+02:00', view='', location='Stockholm, Sverige'), CalendarResponse(Event_id='4htgrk8os48abtpkqfbkf6v7o8', summary='t2 calendar', start='2025-10-02T17:00:00+02:00', end='2025-10-02T19:00:00+02:00', view='', location='Uddevalla, Sverige'), CalendarResponse(Event_id='it6p62uuqmsjopjci0vdb3sor0', summary='The Sacred Session at Sacred Sauna', start='2025-10-02T18:30:00+02:00', end='2025-10-02T19:30:00+02:00', view='', location='Sacred Sauna')]), 'transportation_list': [Transportation(info='From: Kungsholms Strand 159, Stockholm\nTo: Råstavägen 3, 169 54 Solna, Sverige\nMode: Public Transportation\n\nRoute 1:\n- Departure Time: Now\n- Arrival Time: 27 minutes from now\n- Total Travel Duration: 27 minutes\n- Transit Lines/Routes:\n  - Walk to Stadshagen (12 minutes)\n  - Subway towards Akalla (6 minutes)\n  - Walk to Råstavägen 3, 169 54 Solna, Sweden (9 minutes)'), Transportation(info='From: Råstavägen 3, 169 54 Solna, Sverige\nTo: Stockholm, Sverige\nMode: Public Transportation\n\nRoute 1:\n- Departure Time: Now\n- Arrival Time: 20 minutes from now\n- Total Travel Duration: 20 minutes\n- Transit Lines/Routes:\n  - Walk to Östervägen (4 minutes)\n  - Bus towards Solna centrum (7 minutes)\n  - Walk to Solna centrum (1 minute)\n  - Bus towards Blackebergs gård (5 minutes)'), Transportation(info='From: Stockholm, Sverige\nTo: Uddevalla, Sverige\nMode: Public Transportation\n\nRoute 1:\n- Departure Time: Now\n- Arrival Time: 4 hours 13 minutes from now\n- Total Travel Duration: 4 hours 13 minutes\n- Transit Lines/Routes:\n  - High speed train towards Göteborg Centralstation (2 hours 42 mins)\n  - Train towards Uddevalla Centralstation (1 hour 22 mins)'), Transportation(info="From: Uddevalla, Sverige\nTo: Sacred Sauna\nMode: Public Transportation\n\nRoute 1:\n- Departure Time: Now\n- Arrival Time: 1 day 3 hours from now\n- Total Travel Duration: 1 day 3 hours\n- Transit Lines/Routes:\n  - Bus towards Göteborg Nils Ericsonterminal (1 hour 15 mins)\n  - Walk to Gothenburg Central Station (2 mins)\n  - High speed train towards Malmö Centralstation (2 hours 30 mins)\n  - Walk to Malmo Norra Vallgatan (3 mins)\n  - Bus towards Paris Bercy Central Bus Station (11 hours 20 mins)\n  - Walk to Arnhem Central (1 min)\n  - Train towards Den Helder (37 mins)\n  - Walk to Utrecht Centraal (1 min)\n  - Train towards Dordrecht (31 mins)\n  - High speed train towards Paris-Nord (1 hour 39 mins)\n  - Walk to Brussels Midi Train Station (2 mins)\n  - High speed train towards London St Pancras Int'l (2 hours 6 mins)\n  - Walk to King's Cross St. Pancras (3 mins)\n  - Subway towards Hammersmith (10 mins)\n  - Walk to Paddington (2 mins)\n  - Train towards Penzance (1 hour 41 mins)\n  - Walk to Taunton Station South Side (2 mins)\n  - Bus towards Langley Corner, Bus (33 mins)\n  - Walk to Winkley House Studio, Fore St, Milverton, Taunton TA4 1JU, UK (4 mins)")], 'new_email': MailList(mails=[Mail(subject='Work', sender='Oden Allen <oden.allen@gmail.com>', summary='Work. No preview available.'), Mail(subject='💡🧠 What makes you, you?', sender='Lumosity <newsletter@notifications.lumosity.com>', summary='💡🧠 What makes you, you? No preview available.'), Mail(subject='Ett förtvivlat fint erbjudande – 1 månad för 9 kr 📚', sender='BookBeat <team@news.bookbeat.com>', summary='Ett förtvivlat fint erbjudande – 1 månad för 9 kr 📚. No preview available.'), Mail(subject='“software engineer”: Generate - AI Backend Developer and more', sender='LinkedIn Job Alerts <jobalerts-noreply@linkedin.com>', summary='“software engineer”: Generate - AI Backend Developer and more. No preview available.'), Mail(subject='Deploja AB: 4 nya jobb matchar din profil', sender='Deploja AB <no-reply@deplojaab.teamtailor-mail.com>', summary='Deploja AB: 4 nya jobb matchar din profil. No preview available.'), Mail(subject='“software engineer”: Solita - AI Developer – Stockholm and more', sender='LinkedIn Job Alerts <jobalerts-noreply@linkedin.com>', summary='“software engineer”: Solita - AI Developer – Stockholm and more. No preview available.'), Mail(subject='Ditt paket är på väg från Jollyroom.se', sender='"Jollyroom.se" <no-reply@jollyroom.se>', summary='Ditt paket är på väg från Jollyroom.se. No preview available.'), Mail(subject='Påminnelse: Obetald elfaktura från Greenely', sender='No reply <noreply@delivery.payex.com>', summary='Påminnelse: Obetald elfaktura från Greenely. No preview available.'), Mail(subject='Veckans erbjudanden i din butik', sender='Coop <info@e.coop.se>', summary='Veckans erbjudanden i din butik. No preview available.'), Mail(subject='1 LAST Chance To Receive 2 Rewards After Your Getaway 🏖️', sender='Hilton Grand Vacations <hgv@travel.hiltongrandvacations.com>', summary='1 LAST Chance To Receive 2 Rewards After Your Getaway 🏖️. No preview available.')])}
-        # print(" \nMade it into method: DataCollector.locToGeocode_node\n")
-        # print(f"Home Location: \n {self.config['home_location']}")
+            # Format
         
-        msg= """I would like for you to give me a geocode from a location.\n
-        Address: {address}, {postal_code} in {city}
-                
-                
-                """
-        msg_format=msg.format(address=self.config['home_location'][0]['address'],postal_code=self.config['home_location'][0]['postal code'],city = self.config['home_location'][0]['city'])
-        print(msg_format)
+        msg_format=locToGeo_msg.format(address=self.config['home_location'][0]['address'],postal_code=self.config['home_location'][0]['postal code'],city = self.config['home_location'][0]['city'])
+        
+            # new model generation
         response_model = await self.setLLM(new_model=True,response_format=LocationCoordinates)
+            
+            # LLM call
         formatted_agent_response = await response_model.ainvoke({"messages": [HumanMessage(content=msg_format)]},config=self.llmConfig)
 
-        print(f"conf: {self.config['home_location'][0]}")
 
+            # Value checker
         if formatted_agent_response["structured_response"].latitude != float(0) and formatted_agent_response["structured_response"].longitude!=float(0):
             self.config['home_location'][0]['latitude'] = formatted_agent_response["structured_response"].latitude
             self.config['home_location'][0]['longitude'] = formatted_agent_response["structured_response"].longitude
-        print(f"conf: {self.config['home_location'][0]}")
+
+
+
         return state
 
     async def weather_node(self,state:DayAgentState):
@@ -343,15 +326,7 @@ class DataCollector:
         print(" \nMade it into method: DataCollector.weather_node\n")
 
 
-                # TO be removed later
-
-        self.config = {'name': 'Oden', 'location': 'Stockholm', 'work_location': [{'address': 'Råstavägen 3', 'city': 'Solna', 'postal code': '169 54'}], 'home_location': [{'address': 'Kungsholms Strand 159', 'city': 'Stockholm', 'postal code': '112 48'}], 'dentist_location': [{'address': None, 'city': None, 'postal code': None}], 'calendar_events': CalendarList(events=[CalendarResponse(Event_id='_8gpk4ca188s46ba48p238b9k6gp3cb9o8gpk2ba46l1jadpk8h2k6e236c', summary='Mattias Jobba', start='2025-10-02T10:15:00+02:00', end='2025-10-02T11:15:00+02:00', view='', location='Råstavägen 3\n169 54 Solna, Sverige'), CalendarResponse(Event_id='5l1uraj9fdhvn0n8q4717mi75c', summary='T1 Calendar', start='2025-10-02T16:30:00+02:00', end='2025-10-02T17:30:00+02:00', view='', location='Stockholm, Sverige'), CalendarResponse(Event_id='4htgrk8os48abtpkqfbkf6v7o8', summary='t2 calendar', start='2025-10-02T17:00:00+02:00', end='2025-10-02T19:00:00+02:00', view='', location='Uddevalla, Sverige'), CalendarResponse(Event_id='it6p62uuqmsjopjci0vdb3sor0', summary='The Sacred Session at Sacred Sauna', start='2025-10-02T18:30:00+02:00', end='2025-10-02T19:30:00+02:00', view='', location='Sacred Sauna')]), 'transportation_list': [Transportation(info='From: Kungsholms Strand 159, Stockholm\nTo: Råstavägen 3, 169 54 Solna, Sverige\nMode: Public Transportation\n\nRoute 1:\n- Departure Time: Now\n- Arrival Time: 27 minutes from now\n- Total Travel Duration: 27 minutes\n- Transit Lines/Routes:\n  - Walk to Stadshagen (12 minutes)\n  - Subway towards Akalla (6 minutes)\n  - Walk to Råstavägen 3, 169 54 Solna, Sweden (9 minutes)'), Transportation(info='From: Råstavägen 3, 169 54 Solna, Sverige\nTo: Stockholm, Sverige\nMode: Public Transportation\n\nRoute 1:\n- Departure Time: Now\n- Arrival Time: 20 minutes from now\n- Total Travel Duration: 20 minutes\n- Transit Lines/Routes:\n  - Walk to Östervägen (4 minutes)\n  - Bus towards Solna centrum (7 minutes)\n  - Walk to Solna centrum (1 minute)\n  - Bus towards Blackebergs gård (5 minutes)'), Transportation(info='From: Stockholm, Sverige\nTo: Uddevalla, Sverige\nMode: Public Transportation\n\nRoute 1:\n- Departure Time: Now\n- Arrival Time: 4 hours 13 minutes from now\n- Total Travel Duration: 4 hours 13 minutes\n- Transit Lines/Routes:\n  - High speed train towards Göteborg Centralstation (2 hours 42 mins)\n  - Train towards Uddevalla Centralstation (1 hour 22 mins)'), Transportation(info="From: Uddevalla, Sverige\nTo: Sacred Sauna\nMode: Public Transportation\n\nRoute 1:\n- Departure Time: Now\n- Arrival Time: 1 day 3 hours from now\n- Total Travel Duration: 1 day 3 hours\n- Transit Lines/Routes:\n  - Bus towards Göteborg Nils Ericsonterminal (1 hour 15 mins)\n  - Walk to Gothenburg Central Station (2 mins)\n  - High speed train towards Malmö Centralstation (2 hours 30 mins)\n  - Walk to Malmo Norra Vallgatan (3 mins)\n  - Bus towards Paris Bercy Central Bus Station (11 hours 20 mins)\n  - Walk to Arnhem Central (1 min)\n  - Train towards Den Helder (37 mins)\n  - Walk to Utrecht Centraal (1 min)\n  - Train towards Dordrecht (31 mins)\n  - High speed train towards Paris-Nord (1 hour 39 mins)\n  - Walk to Brussels Midi Train Station (2 mins)\n  - High speed train towards London St Pancras Int'l (2 hours 6 mins)\n  - Walk to King's Cross St. Pancras (3 mins)\n  - Subway towards Hammersmith (10 mins)\n  - Walk to Paddington (2 mins)\n  - Train towards Penzance (1 hour 41 mins)\n  - Walk to Taunton Station South Side (2 mins)\n  - Bus towards Langley Corner, Bus (33 mins)\n  - Walk to Winkley House Studio, Fore St, Milverton, Taunton TA4 1JU, UK (4 mins)")], 'new_email': MailList(mails=[Mail(subject='Work', sender='Oden Allen <oden.allen@gmail.com>', summary='Work. No preview available.'), Mail(subject='💡🧠 What makes you, you?', sender='Lumosity <newsletter@notifications.lumosity.com>', summary='💡🧠 What makes you, you? No preview available.'), Mail(subject='Ett förtvivlat fint erbjudande – 1 månad för 9 kr 📚', sender='BookBeat <team@news.bookbeat.com>', summary='Ett förtvivlat fint erbjudande – 1 månad för 9 kr 📚. No preview available.'), Mail(subject='“software engineer”: Generate - AI Backend Developer and more', sender='LinkedIn Job Alerts <jobalerts-noreply@linkedin.com>', summary='“software engineer”: Generate - AI Backend Developer and more. No preview available.'), Mail(subject='Deploja AB: 4 nya jobb matchar din profil', sender='Deploja AB <no-reply@deplojaab.teamtailor-mail.com>', summary='Deploja AB: 4 nya jobb matchar din profil. No preview available.'), Mail(subject='“software engineer”: Solita - AI Developer – Stockholm and more', sender='LinkedIn Job Alerts <jobalerts-noreply@linkedin.com>', summary='“software engineer”: Solita - AI Developer – Stockholm and more. No preview available.'), Mail(subject='Ditt paket är på väg från Jollyroom.se', sender='"Jollyroom.se" <no-reply@jollyroom.se>', summary='Ditt paket är på väg från Jollyroom.se. No preview available.'), Mail(subject='Påminnelse: Obetald elfaktura från Greenely', sender='No reply <noreply@delivery.payex.com>', summary='Påminnelse: Obetald elfaktura från Greenely. No preview available.'), Mail(subject='Veckans erbjudanden i din butik', sender='Coop <info@e.coop.se>', summary='Veckans erbjudanden i din butik. No preview available.'), Mail(subject='1 LAST Chance To Receive 2 Rewards After Your Getaway 🏖️', sender='Hilton Grand Vacations <hgv@travel.hiltongrandvacations.com>', summary='1 LAST Chance To Receive 2 Rewards After Your Getaway 🏖️. No preview available.')])}
-
-        self.config['home_location'][0] = {'address': 'Kungsholms Strand 159', 'city': 'Stockholm', 'postal code': '112 48', 'latitude': 59.3382069, 'longitude': 18.0258636}
-
-
                 # Populating Docstring prompt
-
         weather_prompt_formatted = weather_prompt.format(timezone=self.config['location'],latitude=self.config['home_location'][0]['latitude'],longitude=self.config['home_location'][0]['longitude'])
         
                 # formatted response model
@@ -361,9 +336,8 @@ class DataCollector:
         agent_response = await response_model.ainvoke({"messages": [HumanMessage(content=weather_prompt_formatted)]},config=self.llmConfig)
         
                 # Config assignment
-        
         self.config["weather"] = agent_response["structured_response"].hourly_weather
-        print(f"\nweather return: {agent_response['structured_response'].hourly_weather}\n")
+
         return state
     
 
@@ -373,13 +347,11 @@ class DataCollector:
         
         """
         print(" \nMade it into method: DataCollector.saveConf\n")
-        self.config = {'name': 'Oden', 'location': 'Stockholm', 'work_location': [{'address': 'Råstavägen 3', 'city': 'Solna', 'postal code': '169 54'}], 'home_location': [{'address': 'Kungsholms Strand 159', 'city': 'Stockholm', 'postal code': '112 48', 'latitude': 59.3382069, 'longitude': 18.0258636}], 'dentist_location': [{'address': None, 'city': None, 'postal code': None}], 'calendar_events': CalendarList(events=[CalendarResponse(Event_id='_8gpk4ca188s46ba48p238b9k6gp3cb9o8gpk2ba46l1jadpk8h2k6e236c', summary='Mattias Jobba', start='2025-10-02T10:15:00+02:00', end='2025-10-02T11:15:00+02:00', view='', location='Råstavägen 3\n169 54 Solna, Sverige'), CalendarResponse(Event_id='5l1uraj9fdhvn0n8q4717mi75c', summary='T1 Calendar', start='2025-10-02T16:30:00+02:00', end='2025-10-02T17:30:00+02:00', view='', location='Stockholm, Sverige'), CalendarResponse(Event_id='4htgrk8os48abtpkqfbkf6v7o8', summary='t2 calendar', start='2025-10-02T17:00:00+02:00', end='2025-10-02T19:00:00+02:00', view='', location='Uddevalla, Sverige'), CalendarResponse(Event_id='it6p62uuqmsjopjci0vdb3sor0', summary='The Sacred Session at Sacred Sauna', start='2025-10-02T18:30:00+02:00', end='2025-10-02T19:30:00+02:00', view='', location='Sacred Sauna')]), 'transportation_list': [Transportation(info='From: Kungsholms Strand 159, Stockholm\nTo: Råstavägen 3, 169 54 Solna, Sverige\nMode: Public Transportation\n\nRoute 1:\n- Departure Time: Now\n- Arrival Time: 27 minutes from now\n- Total Travel Duration: 27 minutes\n- Transit Lines/Routes:\n  - Walk to Stadshagen (12 minutes)\n  - Subway towards Akalla (6 minutes)\n  - Walk to Råstavägen 3, 169 54 Solna, Sweden (9 minutes)'), Transportation(info='From: Råstavägen 3, 169 54 Solna, Sverige\nTo: Stockholm, Sverige\nMode: Public Transportation\n\nRoute 1:\n- Departure Time: Now\n- Arrival Time: 20 minutes from now\n- Total Travel Duration: 20 minutes\n- Transit Lines/Routes:\n  - Walk to Östervägen (4 minutes)\n  - Bus towards Solna centrum (7 minutes)\n  - Walk to Solna centrum (1 minute)\n  - Bus towards Blackebergs gård (5 minutes)'), Transportation(info='From: Stockholm, Sverige\nTo: Uddevalla, Sverige\nMode: Public Transportation\n\nRoute 1:\n- Departure Time: Now\n- Arrival Time: 4 hours 13 minutes from now\n- Total Travel Duration: 4 hours 13 minutes\n- Transit Lines/Routes:\n  - High speed train towards Göteborg Centralstation (2 hours 42 mins)\n  - Train towards Uddevalla Centralstation (1 hour 22 mins)'), Transportation(info="From: Uddevalla, Sverige\nTo: Sacred Sauna\nMode: Public Transportation\n\nRoute 1:\n- Departure Time: Now\n- Arrival Time: 1 day 3 hours from now\n- Total Travel Duration: 1 day 3 hours\n- Transit Lines/Routes:\n  - Bus towards Göteborg Nils Ericsonterminal (1 hour 15 mins)\n  - Walk to Gothenburg Central Station (2 mins)\n  - High speed train towards Malmö Centralstation (2 hours 30 mins)\n  - Walk to Malmo Norra Vallgatan (3 mins)\n  - Bus towards Paris Bercy Central Bus Station (11 hours 20 mins)\n  - Walk to Arnhem Central (1 min)\n  - Train towards Den Helder (37 mins)\n  - Walk to Utrecht Centraal (1 min)\n  - Train towards Dordrecht (31 mins)\n  - High speed train towards Paris-Nord (1 hour 39 mins)\n  - Walk to Brussels Midi Train Station (2 mins)\n  - High speed train towards London St Pancras Int'l (2 hours 6 mins)\n  - Walk to King's Cross St. Pancras (3 mins)\n  - Subway towards Hammersmith (10 mins)\n  - Walk to Paddington (2 mins)\n  - Train towards Penzance (1 hour 41 mins)\n  - Walk to Taunton Station South Side (2 mins)\n  - Bus towards Langley Corner, Bus (33 mins)\n  - Walk to Winkley House Studio, Fore St, Milverton, Taunton TA4 1JU, UK (4 mins)")], 'new_email': MailList(mails=[Mail(subject='Work', sender='Oden Allen <oden.allen@gmail.com>', summary='Work. No preview available.'), Mail(subject='💡🧠 What makes you, you?', sender='Lumosity <newsletter@notifications.lumosity.com>', summary='💡🧠 What makes you, you? No preview available.'), Mail(subject='Ett förtvivlat fint erbjudande – 1 månad för 9 kr 📚', sender='BookBeat <team@news.bookbeat.com>', summary='Ett förtvivlat fint erbjudande – 1 månad för 9 kr 📚. No preview available.'), Mail(subject='“software engineer”: Generate - AI Backend Developer and more', sender='LinkedIn Job Alerts <jobalerts-noreply@linkedin.com>', summary='“software engineer”: Generate - AI Backend Developer and more. No preview available.'), Mail(subject='Deploja AB: 4 nya jobb matchar din profil', sender='Deploja AB <no-reply@deplojaab.teamtailor-mail.com>', summary='Deploja AB: 4 nya jobb matchar din profil. No preview available.'), Mail(subject='“software engineer”: Solita - AI Developer – Stockholm and more', sender='LinkedIn Job Alerts <jobalerts-noreply@linkedin.com>', summary='“software engineer”: Solita - AI Developer – Stockholm and more. No preview available.'), Mail(subject='Ditt paket är på väg från Jollyroom.se', sender='"Jollyroom.se" <no-reply@jollyroom.se>', summary='Ditt paket är på väg från Jollyroom.se. No preview available.'), Mail(subject='Påminnelse: Obetald elfaktura från Greenely', sender='No reply <noreply@delivery.payex.com>', summary='Påminnelse: Obetald elfaktura från Greenely. No preview available.'), Mail(subject='Veckans erbjudanden i din butik', sender='Coop <info@e.coop.se>', summary='Veckans erbjudanden i din butik. No preview available.'), Mail(subject='1 LAST Chance To Receive 2 Rewards After Your Getaway 🏖️', sender='Hilton Grand Vacations <hgv@travel.hiltongrandvacations.com>', summary='1 LAST Chance To Receive 2 Rewards After Your Getaway 🏖️. No preview available.')]), 'weather': [WeatherInfo(hour='12:00', temperature='13.35', precipitation='0.02'), WeatherInfo(hour='13:00', temperature='14.05', precipitation='0.05'), WeatherInfo(hour='14:00', temperature='14.55', precipitation='0.07'), WeatherInfo(hour='15:00', temperature='14.82', precipitation='0.06'), WeatherInfo(hour='16:00', temperature='14.89', precipitation='0.05'), WeatherInfo(hour='17:00', temperature='14.62', precipitation='0.03'), WeatherInfo(hour='18:00', temperature='13.79', precipitation='0.02'), WeatherInfo(hour='19:00', temperature='12.62', precipitation='0.01'), WeatherInfo(hour='20:00', temperature='11.59', precipitation='0.00'), WeatherInfo(hour='21:00', temperature='10.88', precipitation='0.00'), WeatherInfo(hour='22:00', temperature='10.31', precipitation='0.00'), WeatherInfo(hour='23:00', temperature='9.81', precipitation='0.00')]}
+
         dirname = os.path.dirname(__file__)
-        print(dirname)
         
         if "/app" in dirname:
             dirname = dirname.replace("/app","")
-
 
         config_serializable = {
             "name": self.config["name"],
@@ -387,14 +359,13 @@ class DataCollector:
             "work_location": self.config["work_location"],
             "home_location": self.config["home_location"],
             "dentist_location": self.config["dentist_location"],
-            "calendar_events": [event.model_dump() for event in self.config["calendar_events"].events],
+            "calendar_events": [event.model_dump() for event in self.config["calendar_events"]],
             "transportation_list": [t.model_dump() for t in self.config["transportation_list"]],
             "new_email": [mail.model_dump() for mail in self.config["new_email"].mails],
             "weather": [w.model_dump() for w in self.config["weather"]]
         }
 
         savePath =os.path.join(dirname,"result","results.json") 
-        print(savePath)
         with open(savePath, 'w') as f:
             json.dump(config_serializable, f, indent=2)
 
@@ -455,11 +426,12 @@ class ContentProcessor:
 
     def load_template_from_file(self):
         """ This method loads the template that will be populated"""
+
         print(" \nMade it into method: content_processor.load_template_from_file\n")
+
         template_dir = os.path.dirname("templates/email-template.md")
         template_name = os.path.basename("templates/email-template.md")
-        print(template_dir)
-        print(template_name)
+
         env = Environment(loader=FileSystemLoader(template_dir))
         return env.get_template(template_name)
 
@@ -487,24 +459,13 @@ class ContentProcessor:
 
 
 
-class PDFGenerator:
-    
-    """
-    UNKNOWN
-    This Class generates the PDF(IF We choose to have this format! )
-    UNKNOWN
-    """
-    
-    pass
-
-
 
 async def run(obj: DayAgent):
     print(" \nMade it into method: Run\n")
 
     conf = {"configurable": {"thread_id": "1"}}
-    inputs = {"messages": [HumanMessage(content="We trying this!")]}
-    agent_response = await obj.graph.ainvoke(inputs,conf)
+    inputs = {"messages": [HumanMessage(content="")]}
+    await obj.graph.ainvoke(inputs,conf)
 
 
 
